@@ -1,6 +1,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/usb.h>
+#include "proc/proc.h"
 MODULE_LICENSE("GPL");
 #define USB_VENDOR_ID 0x488
 #define USB_PRODUCT_ID 0x5740
@@ -18,6 +19,7 @@ MODULE_DEVICE_TABLE(usb, etx_usb_table);
 static int etx_usb_probe(struct usb_interface *interface,
                         const struct usb_device_id *id)
 {
+    //interface->
     dev_info(&interface->dev, "USB Driver Probed: Vendor ID : 0x%02x,\t"
              "Product ID : 0x%02x\n", id->idVendor, id->idProduct);
     return 0;  //return 0 indicates we are managing this device
@@ -33,6 +35,7 @@ static struct usb_driver etx_usb_driver = {
     .probe      = etx_usb_probe,
     .disconnect = etx_usb_disconnect,
     .id_table   = etx_usb_table,
+    
 };
 
 
@@ -58,6 +61,10 @@ static struct usb_driver etx_usb_driver = {
 static int __init startup(void)
 {
     printk("Module startup usbdrv module i mean!");
+     if(!init_proc_entry())
+    {
+        return -ENOMEM;
+    }
     usb_register(&etx_usb_driver);
     return 0;
 }
@@ -65,11 +72,13 @@ static int __init startup(void)
 static void __exit cleanup(void)
 {
    printk("Module cleanup usbdrv module i mean!");
+   
    usb_deregister(&etx_usb_driver);
+   deinit_proc_entry();
 }
 
 module_init(startup);
 module_exit(cleanup);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Linux");
+MODULE_AUTHOR("Ali");
