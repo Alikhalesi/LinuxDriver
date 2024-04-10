@@ -1,16 +1,24 @@
 
 #include "proc.h"
+
 #define PROC_BASE "STMProgrammer"
 #define PROC_CONNECTION_R "connection"
 
 
 static ssize_t read_proc(struct file *filp,char *buf,size_t count,loff_t *offp ) 
 {
-
+    
+printk("count: %d",count);
+if(*offp>=15)
+{
+    return 0;
+}
 const unsigned int len=count>15?15:count;
 const unsigned long res=copy_to_user(buf,"hi from kernel", len);
+
 *offp=len;
-return count;
+return len;
+
 }
 
 static struct proc_ops proc_fops = {
