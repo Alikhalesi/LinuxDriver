@@ -2,7 +2,6 @@
 #include "proc.h"
 
 #define PROC_BASE "STMProgrammer"
-#define PROC_CONNECTION_R "connection"
 
 
 static ssize_t read_proc(struct file *filp,char *buf,size_t count,loff_t *offp ) 

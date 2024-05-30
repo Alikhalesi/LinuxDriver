@@ -14,10 +14,8 @@ PWD       := $(shell pwd)
 EXTRA_CFLAGS := -I$(PWD)/proc
 
 all:
-	make -C $(KERNELDIR) M=$(PWD) modules
-	# $(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
-build:
-	# $(MAKE) EXTRAVERSION=$(EXTRAVERSION) --debug=v -C $(KERNELDIR) M=$(PWD) modules
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+	$(MAKE)  -C $(KERNELDIR) M=$(PWD) modules	
+modules_install:	
+	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
 clean:
-	make -C $(KERNELDIR) M=$(PWD) clean
+	$(MAKE)  -C $(KERNELDIR) M=$(PWD) clean
