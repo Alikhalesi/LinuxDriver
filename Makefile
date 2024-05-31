@@ -7,15 +7,16 @@ $(MODULE_NAME)-objs = $(SRC:.c=.o)
 
 obj-m       := $(MODULE_NAME).o
 
-KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 PWD       := $(shell pwd)
 
 
 EXTRA_CFLAGS := -I$(PWD)/proc
 
 all:
-	$(MAKE)  -C $(KERNELDIR) M=$(PWD) modules	
+	$(MAKE)  -C $(KERNEL_SRC) M=$(PWD) modules	
 modules_install:	
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
+	$(MAKE) -C $(KERNEL_SRC) M=$(PWD) modules_install
 clean:
-	$(MAKE)  -C $(KERNELDIR) M=$(PWD) clean
+	$(MAKE)  -C $(KERNEL_SRC) M=$(PWD) clean
+#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
