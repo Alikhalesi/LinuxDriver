@@ -1,0 +1,27 @@
+{
+    "configurations": [       
+            
+        {
+            "name": "LinuxKernel",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/lib/modules/6.5.0-35-generic/build/include",
+                "/lib/modules/6.5.0-35-generic/build/arch/x86/include",
+                "/lib/modules/6.5.0-35-generic/build/arch/x86/include/**",
+                "/lib/modules/6.5.0-35-generic/build/include/generated"
+            ],
+            "defines": [
+                "__KERNEL__",
+                "MODULE"
+            ],
+            "forcedInclude": [
+                "/lib/modules/6.5.0-35-generic/build/include/generated/autoconf.h"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",            
+            "intelliSenseMode": "gcc-x86"
+        }
+    ],
+    "version": 4
+}
+//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
