@@ -75,25 +75,30 @@ static int etx_usb_probe(struct usb_interface *interface,
     usb_register_dev(interface,&stm_class);
             
     struct usb_stm_dev* stm_dev=kmalloc(sizeof(struct usb_stm_dev),GFP_KERNEL);
-    stm_dev->udev=interface->usb_dev;
+    stm_dev->udev=interface_to_usbdev(interface);
     stm_dev->interface=interface;
     
     struct usb_host_interface* current_interface= interface->cur_altsetting;
 
+    printk("Endpoinst num: %d",current_interface->desc.bNumEndpoints);
+
     for(int i=0;i<current_interface->desc.bNumEndpoints;i++)
     {
+        printk("Endpoint : %d , %d",current_interface->endpoint[i].desc.bEndpointAddress,current_interface->endpoint[i].desc.bmAttributes);
+
         if((current_interface->endpoint[i].desc.bEndpointAddress & USB_DIR_IN) &&
         ((current_interface->endpoint[i].desc.bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)==USB_ENDPOINT_XFER_BULK)
         )
         {
             stm_dev->bulk_in_endpointAddr=current_interface->endpoint[i].desc.bEndpointAddress;
             stm_dev->bulk_in_size=current_interface->endpoint[i].desc.wMaxPacketSize;
+            printk("Bulk in size%d",stm_dev->bulk_in_size);
             stm_dev->bulk_in_buffer=kmalloc(stm_dev->bulk_in_size,GFP_KERNEL);
         }
-        else if((current_interface->endpoint[i].desc.bEndpointAddress & USB_DIR_OUT) &&
-        ((current_interface->endpoint[i].desc.bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)==USB_ENDPOINT_XFER_BULK)
-        )
+        else //if((current_interface->endpoint[i].desc.bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)==USB_ENDPOINT_XFER_BULK)
+        
         {
+            printk("Bulk out ");
             stm_dev->bulk_out_endpointAddr=current_interface->endpoint[i].desc.bEndpointAddress;  
         }
     }
@@ -118,9 +123,12 @@ static ssize_t write(struct file* f,const char* data,size_t len,loff_t* offset)
 {
     printk("usb write is called!");
     struct usb_stm_dev* dv=f->private_data;
+    if(dv==NULL)
+        printk("dv null");
     copy_from_user(dv->bulk_in_buffer,data,len);
-    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,len,offset,HZ*10);
-    *offset=len;
+    int actual=0;
+    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,len,&actual,HZ*10);    
+     printk("write has been returned %d",actual);
     return len;
 }
 
@@ -129,8 +137,10 @@ static ssize_t read(struct file* f,char* data,size_t len,loff_t* offset)
 
     printk("usb read is called!");
     struct usb_stm_dev* dv=f->private_data;
-    int retval=usb_bulk_msg(dv->udev,usb_rcvbulkpipe(dv->udev,dv->bulk_in_endpointAddr),dv->bulk_in_buffer,min(dv->bulk_in_size,len),offset,HZ*10);
+    int actual=0;
+    int retval=usb_bulk_msg(dv->udev,usb_rcvbulkpipe(dv->udev,dv->bulk_in_endpointAddr),dv->bulk_in_buffer,min(dv->bulk_in_size,len),&actual,HZ*10);
     copy_to_user(data,dv->bulk_in_buffer,len);
+     printk("usb read is returned %d!",actual);
     return len;
 
 }
@@ -180,10 +190,10 @@ static int open(struct inode* inod,struct file* f)
 static int __init startup(void)
 {
     printk("Module startup usbdrv module i mean!");
-     if(!init_proc_entry())
-    {
-        return -ENOMEM;
-    }
+    //  if(!init_proc_entry())
+    // {
+    //     return -ENOMEM;
+    // }
     usb_register(&etx_usb_driver);
     return 0;
 }
@@ -194,7 +204,7 @@ static void __exit cleanup(void)
    
 
    usb_deregister(&etx_usb_driver);
-   deinit_proc_entry();
+ //  deinit_proc_entry();
 }
 
 module_init(startup);

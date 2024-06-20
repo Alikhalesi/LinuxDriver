@@ -1,0 +1,1 @@
+savedcmd_/home/ali/programming/usbdrv/usbdrv_module.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/ali/programming/usbdrv/usbdrv_module.ko /home/ali/programming/usbdrv/usbdrv_module.o /home/ali/programming/usbdrv/usbdrv_module.mod.o;  make -f ./arch/x86/Makefile.postlink /home/ali/programming/usbdrv/usbdrv_module.ko
