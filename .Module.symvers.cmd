@@ -1,1 +1,0 @@
-savedcmd_/home/ali/programming/usbdrv/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/ali/programming/usbdrv/Module.symvers -T /home/ali/programming/usbdrv/modules.order -i Module.symvers -e 

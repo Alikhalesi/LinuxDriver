@@ -1,0 +1,3 @@
+[submodule "DeviceHostAPI"]
+	path = DeviceHostAPI
+	url = https://github.com/Alikhalesi/DeviceHostAPI.git

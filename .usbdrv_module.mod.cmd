@@ -1,1 +1,0 @@
-savedcmd_/home/ali/programming/usbdrv/usbdrv_module.mod := printf '%s\n'   usbdrv.o proc/proc.o | awk '!x[$$0]++ { print("/home/ali/programming/usbdrv/"$$0) }' > /home/ali/programming/usbdrv/usbdrv_module.mod
