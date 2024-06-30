@@ -103,7 +103,7 @@ static int etx_usb_probe(struct usb_interface *interface,
         }
     }
 
-    
+   
     usb_set_intfdata(interface,stm_dev);        
     return 0;  //return 0 indicates we are managing this device
 }
@@ -121,15 +121,16 @@ static void etx_usb_disconnect(struct usb_interface *interface)
 
 static ssize_t write(struct file* f,const char* data,size_t len,loff_t* offset)
 {
-    printk("usb write is called!");
+    printk("usb write is called!%d",len);
     struct usb_stm_dev* dv=f->private_data;
     if(dv==NULL)
         printk("dv null");
-    copy_from_user(dv->bulk_in_buffer,data,len);
+    const int actualSize=min(dv->bulk_in_size,len);
+    copy_from_user(dv->bulk_in_buffer,data,actualSize);
     int actual=0;
-    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,len,&actual,HZ*10);    
+    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,actualSize,&actual,HZ*10);    
      printk("write has been returned %d",actual);
-    return len;
+    return actual;
 }
 
 static ssize_t read(struct file* f,char* data,size_t len,loff_t* offset)
