@@ -1,7 +1,7 @@
 CONFIG_MODULE_SIG=n
 MODULE_NAME = usbdrv_module
 
-SRC     := usbdrv.c proc/proc.c
+SRC     := usbdrv.c
 
 $(MODULE_NAME)-objs = $(SRC:.c=.o)
 

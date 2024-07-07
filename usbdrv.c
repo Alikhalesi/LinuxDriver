@@ -1,7 +1,6 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/usb.h>
-#include "proc/proc.h"
 #include <linux/fs.h>
 #include <linux/types.h>
 MODULE_LICENSE("GPL");
@@ -12,20 +11,19 @@ MODULE_LICENSE("GPL");
 
 
 const struct usb_device_id etx_usb_table[] = {
-    { USB_DEVICE( USB_VENDOR_ID, USB_PRODUCT_ID ) },    //Put your USB device's Vendor and Product ID
-    { } /* Terminating entry */
+    { USB_DEVICE( USB_VENDOR_ID, USB_PRODUCT_ID ) },   
+    { } 
 };
 MODULE_DEVICE_TABLE(usb, etx_usb_table);
 
 
 struct usb_stm_dev {
-	struct usb_device *	udev;			/* the usb device for this device */
-	struct usb_interface *	interface;		/* the interface for this device */
-	unsigned char *		bulk_in_buffer;		/* the buffer to receive data */
-	size_t			bulk_in_size;		/* the size of the receive buffer */
-	__u8			bulk_in_endpointAddr;	/* the address of the bulk in endpoint */
-	__u8			bulk_out_endpointAddr;	/* the address of the bulk out endpoint */
-	struct kref		kref;
+	struct usb_device *	udev;			
+	struct usb_interface *	interface;	
+	unsigned char *		bulk_in_buffer;	
+	size_t			bulk_in_size;		
+	__u8			bulk_in_endpointAddr;	
+	__u8			bulk_out_endpointAddr;	
 };
 
 
@@ -67,7 +65,6 @@ static struct usb_class_driver stm_class = {
 static int etx_usb_probe(struct usb_interface *interface,
                         const struct usb_device_id *id)
 {
-    //interface->
     dev_info(&interface->dev, "USB Driver Probed: Vendor ID : 0x%02x,\t"
              "Product ID : 0x%02x\n", id->idVendor, id->idProduct);
     
@@ -95,8 +92,7 @@ static int etx_usb_probe(struct usb_interface *interface,
             printk("Bulk in size%d",stm_dev->bulk_in_size);
             stm_dev->bulk_in_buffer=kmalloc(stm_dev->bulk_in_size,GFP_KERNEL);
         }
-        else //if((current_interface->endpoint[i].desc.bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)==USB_ENDPOINT_XFER_BULK)
-        
+        else 
         {
             printk("Bulk out ");
             stm_dev->bulk_out_endpointAddr=current_interface->endpoint[i].desc.bEndpointAddress;  
@@ -105,7 +101,7 @@ static int etx_usb_probe(struct usb_interface *interface,
 
    
     usb_set_intfdata(interface,stm_dev);        
-    return 0;  //return 0 indicates we are managing this device
+    return 0;  
 }
 
 static void etx_usb_disconnect(struct usb_interface *interface)
@@ -122,13 +118,14 @@ static void etx_usb_disconnect(struct usb_interface *interface)
 static ssize_t write(struct file* f,const char* data,size_t len,loff_t* offset)
 {
     printk("usb write is called!%d",len);
+    mdelay(100);
     struct usb_stm_dev* dv=f->private_data;
     if(dv==NULL)
         printk("dv null");
     const int actualSize=min(dv->bulk_in_size,len);
     copy_from_user(dv->bulk_in_buffer,data,actualSize);
     int actual=0;
-    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,actualSize,&actual,HZ*10);    
+    usb_bulk_msg(dv->udev,usb_sndbulkpipe(dv->udev,dv->bulk_out_endpointAddr),dv->bulk_in_buffer,actualSize,&actual,0);    
      printk("write has been returned %d",actual);
     return actual;
 }
@@ -165,29 +162,6 @@ static int open(struct inode* inod,struct file* f)
 	return 0;
 }
 
-
-
-
-
-// struct usb_driver 
-// {
-//   const char * name;
-//   int (* probe) (struct usb_interface *intf,const struct usb_device_id *id);
-//   void (* disconnect) (struct usb_interface *intf);
-//   int (* ioctl) (struct usb_interface *intf, unsigned int code,void *buf);
-//   int (* suspend) (struct usb_interface *intf, pm_message_t message);
-//   int (* resume) (struct usb_interface *intf);
-//   int (* reset_resume) (struct usb_interface *intf);
-//   int (* pre_reset) (struct usb_interface *intf);
-//   int (* post_reset) (struct usb_interface *intf);
-//   const struct usb_device_id * id_table;
-//   struct usb_dynids dynids;
-//   struct usbdrv_wrap drvwrap;
-//   unsigned int no_dynamic_id:1;
-//   unsigned int supports_autosuspend:1;
-//   unsigned int soft_unbind:1;
-// };
-
 static int __init startup(void)
 {
     printk("Module startup usbdrv module i mean!");
@@ -202,10 +176,7 @@ static int __init startup(void)
 static void __exit cleanup(void)
 {
    printk("Module cleanup usbdrv module i mean!");
-   
-
    usb_deregister(&etx_usb_driver);
- //  deinit_proc_entry();
 }
 
 module_init(startup);
