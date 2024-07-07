@@ -118,7 +118,7 @@ static void etx_usb_disconnect(struct usb_interface *interface)
 static ssize_t write(struct file* f,const char* data,size_t len,loff_t* offset)
 {
     printk("usb write is called!%d",len);
-    mdelay(100);
+    mdelay(500);
     struct usb_stm_dev* dv=f->private_data;
     if(dv==NULL)
         printk("dv null");
